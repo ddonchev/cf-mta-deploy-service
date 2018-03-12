@@ -2,17 +2,17 @@
 groups:
 - name: bg-with-content-change-multi-job
   jobs:
-  - bg-content-change-init-space
-  - bg-content-change-undeploy-leftovers
-  - bg-content-change-normal-deployment
-  - bg-content-change-bg-no-action
-  - bg-content-change-bg-test-live-idle
-  - bg-content-change-bg-test-resume-bg
-  - bg-content-change-bg-test-live-app
-  - bg-content-change-bg-test-bg-no-confirm
-  - bg-content-change-bg-test-test-new-blue
-  - bg-content-change-bg-test-undeploy
-  - bg-content-change-bg-test-delete-space
+  - init-space
+  - undeploy-leftovers
+  - normal-deployment
+  - bg-no-action
+  - bg-test-live-idle
+  - bg-test-resume-bg
+  - bg-test-live-app
+  - bg-test-bg-no-confirm
+  - bg-test-test-new-blue
+  - bg-test-undeploy
+  - bg-test-delete-space
 - name: single-job-tests
   jobs:
   - build-docker-image
@@ -47,7 +47,7 @@ jobs:
       outputs:
       - name: "docker-context"
         path: "output"
-  - put: test-environment-image
+  - put: test-env
     params:
       build: docker-context/context
       tag_as_latest: true
@@ -59,13 +59,13 @@ jobs:
       trigger: true #should we run the OQs for each change in the test's code?
     - get: 15m  #Run every 15 minutes
       trigger: true
-    - get: test-environment-image
+    - get: test-env
       trigger: false # if true, it will run whenever a new test content image is created :)
       passed: [build-docker-image]
       params:
         tag: latest
   - task: sanity-check-single-task
-    image: test-environment-image
+    image: test-env
     file: oqtests/oq.tests/test_scenarios/CF Tests/Sanity Check/single-task.yml
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
@@ -92,13 +92,13 @@ jobs:
   - aggregate: 
     - get: oqtests
       trigger: true
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
       passed: [build-docker-image]
       params:
         tag: latest
   - task: test-substep-1
-    image: test-environment-image
+    image: test-env
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/single-task.yml"
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
@@ -125,13 +125,13 @@ jobs:
   - aggregate: 
     - get: oqtests
       trigger: true
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
       passed: [build-docker-image]
       params:
         tag: latest
   - task: init-space
-    image: test-environment-image
+    image: test-env
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/1InitSpace/task.yml"
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
@@ -148,7 +148,7 @@ jobs:
       RT: cf
   - task: undeploy-leftovers
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Undeploy MTA leftovers/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -162,7 +162,7 @@ jobs:
       RT: cf
   - task: normal-deploy
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Test Normal Deploy Blue content/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -189,7 +189,7 @@ jobs:
       RT: cf
   - task: test-both-apps
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Test Live and Idle Apps/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -203,7 +203,7 @@ jobs:
       RT: cf
   - task: resume-bg-deploy
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Resume BG deploy/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -217,7 +217,7 @@ jobs:
       RT: cf
   - task: test-new-version
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Test New Green Live App content/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -231,7 +231,7 @@ jobs:
       RT: cf
   - task: bg-deploy-no-confirm
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/BG Deploy Blue no confirm/task.yml"
-    image: test-environment-image
+    image: test-env
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
       DEPLOY_SERVICE_HOST: ((DEPLOY_SERVICE_HOST))
@@ -244,7 +244,7 @@ jobs:
       SPACE_PREFIX: oqpoc-sjmt
       RT: cf
   - task: test-new-version
-    image: test-environment-image
+    image: test-env
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Test New Blue Live App content/task.yml"
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
@@ -258,7 +258,7 @@ jobs:
       SPACE_PREFIX: oqpoc-sjmt
       RT: cf
   - task: undeploy
-    image: test-environment-image
+    image: test-env
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Undeploy MTA/task.yml"
     params:
       TEST_WORKING_DIRECTORY: "/workspace"
@@ -272,7 +272,7 @@ jobs:
       SPACE_PREFIX: oqpoc-sjmt
       RT: cf
   - task: delete-space
-    image: test-environment-image
+    image: test-env
     file: "oqtests/oq.tests/test_scenarios/CF Tests/Blue Green with Content Change/Delete Space/task.yml"
     on_failure:
       put: slack-alert
@@ -284,12 +284,12 @@ jobs:
         channel: ((slack-chanel))
 
 #BG-multiple jobs, single task each
-- name: bg-content-change-init-space
+- name: init-space
   plan:
   - aggregate: 
     - get: oqtests
       trigger: true
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
       passed: [build-docker-image]
       params:
@@ -309,13 +309,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-undeploy-leftovers
+- name: undeploy-leftovers
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-init-space]
+      passed: [init-space]
       params:
         tag: latest
   - task: test-substep-1
@@ -331,13 +331,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-normal-deployment
+- name: normal-deployment
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-undeploy-leftovers]
+      passed: [undeploy-leftovers]
       params:
         tag: latest
   - task: test-substep-1
@@ -353,13 +353,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-no-action
+- name: bg-no-action
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-normal-deployment]
+      passed: [normal-deployment]
       params:
         tag: latest
   - task: test-substep-1
@@ -375,13 +375,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-live-idle
+- name: bg-test-live-idle
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-bg-no-action]
+      passed: [bg-no-action]
       params:
         tag: latest
   - task: test-substep-1
@@ -397,13 +397,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-resume-bg
+- name: bg-test-resume-bg
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-bg-test-live-idle]
+      passed: [bg-test-live-idle]
       params:
         tag: latest
   - task: test-substep-1
@@ -419,13 +419,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-live-app
+- name: bg-test-live-app
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-bg-test-resume-bg]
+      passed: [bg-test-resume-bg]
       params:
         tag: latest
   - task: test-substep-1
@@ -441,13 +441,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-bg-no-confirm
+- name: bg-test-bg-no-confirm
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [ bg-content-change-bg-test-live-app]
+      passed: [ bg-test-live-app]
       params:
         tag: latest
   - task: test-substep-1
@@ -463,13 +463,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-test-new-blue
+- name: bg-test-test-new-blue
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [bg-content-change-bg-test-bg-no-confirm]
+      passed: [bg-test-bg-no-confirm]
       params:
         tag: latest
   - task: test-substep-1
@@ -485,13 +485,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-undeploy
+- name: bg-test-undeploy
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [ bg-content-change-bg-test-test-new-blue]
+      passed: [ bg-test-test-new-blue]
       params:
         tag: latest
   - task: test-substep-1
@@ -507,13 +507,13 @@ jobs:
       USER_PASS: ((USER_PASS))
       SPACE_PREFIX: oqpoc-mjst
       RT: cf
-- name: bg-content-change-bg-test-delete-space
+- name: bg-test-delete-space
   plan:
   - aggregate: 
     - get: oqtests
-    - get: test-environment-image
+    - get: test-env
       trigger: true # let's run whenever a new test content image is created :)
-      passed: [ bg-content-change-bg-test-undeploy]
+      passed: [ bg-test-undeploy]
       params:
         tag: latest
   - task: test-substep-1
@@ -546,7 +546,7 @@ resources:
      branch: master
      skip_ssl_verification: true
 
-- name: test-environment-image
+- name: test-env
   type: docker-image
   source:
      repository: registry:5000/mta-test-image
