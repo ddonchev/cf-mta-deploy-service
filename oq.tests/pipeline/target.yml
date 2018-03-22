@@ -55,6 +55,7 @@ jobs:
     image: test-environment-image
     file: oqtests/oq.tests/test_scenarios/CF Tests/Sanity Check/single-task.yml
     params:
+      DEBUG: 1
       TEST_WORKING_DIRECTORY: "/workspace"
       DEFAULT_ORG: ((DEFAULT_ORG))
       DEFAULT_SPACE: ((DEFAULT_SPACE))
@@ -283,7 +284,7 @@ resources:
 - name: cliplugin
   type: git
   source:
-     uri: https://github.com/ddonchev/cf-mta-plugin.git
+     uri: https://github.com/SAP/cf-mta-plugin.git
      branch: master
      skip_ssl_verification: true
 
