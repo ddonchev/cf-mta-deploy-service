@@ -1,0 +1,1 @@
+Scripts helping with rough failure analytics based on the database content 
