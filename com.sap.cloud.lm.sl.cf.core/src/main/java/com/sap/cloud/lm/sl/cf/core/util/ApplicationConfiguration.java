@@ -18,6 +18,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.sap.cloud.lm.sl.cf.core.auditlogging.AuditLoggingFacade;
@@ -42,6 +43,7 @@ import com.sap.cloud.lm.sl.persistence.util.Configuration;
 import com.sap.cloud.lm.sl.persistence.util.DefaultConfiguration;
 
 @Component
+@Lazy(false)
 public class ApplicationConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfiguration.class);
